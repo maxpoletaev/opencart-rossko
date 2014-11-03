@@ -1,0 +1,52 @@
+.rossko_search {
+  margin-bottom: 20px;
+  background: #eee;
+  display: block;
+  padding: 10px;
+}
+
+  .rossko_search_query {
+    box-sizing: border-box;
+    display: inline-block;
+    height: 30px;
+    width: 80%;
+  }
+
+  .rossko_search_button {
+    box-sizing: border-box;
+    display: inline-block;
+    height: 30px;
+    width: 20%;
+  }
+
+.rossko_products {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+  .rossko_products thead {
+    font-weight: bold;
+  }
+
+    .rossko_products thead th {
+      padding: 20px 10px;
+      background: #eee;
+    }
+
+  .rossko_products tbody {
+
+  }
+
+    .rossko_products tbody td {
+      border-bottom: 1px solid #ddd;
+      padding: 5px 10px;
+    }
+
+
+.rossko_product_buy {
+
+}
+
+  .rossko_product_buy_quantuty {
+    width: 60px;
+  }
