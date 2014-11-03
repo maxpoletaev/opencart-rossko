@@ -2,26 +2,27 @@
 
 class ModelModuleRossko extends Model {
 
-    const KEY1 = 'bd526d521f7bba8b2ac2471fab66b572';
-    const KEY2 = '7ada774909b6f668fa2bea89fd2fe283';
-
     public function searchProduct($query_text) {
         $cache_key = 'rossko.search.' . md5($query_text);
+        $region = $this->config->get('rossko_region');
         $products = $this->cache->get($cache_key);
 
         if (! $products) {
-            $client = new SoapClient('http://samara.rossko.ru/service/v1/GetSearch?wsdl');
+            $client = new SoapClient("http://{$region}.rossko.ru/service/v1/GetSearch?wsdl");
             $products = array();
 
             $query = $client->GetSearch(array(
-                'KEY1' => self::KEY1,
-                'KEY2' => self::KEY2,
+                'KEY1' => $this->config->get('rossko_key1'),
+                'KEY2' => $this->config->get('rossko_key2'),
                 'TEXT' => $query_text
             ));
 
             $searchResult = $query->SearchResults->SearchResult;
 
             if ($searchResult->Success && isset($searchResult->PartsList)) {
+                $conf_overprice = $this->config->get('rossko_overprice');
+                $conf_delivery = $this->config->get('rossko_delivery');
+
                 $parts = $searchResult->PartsList->Part;
 
                 if (!is_array($parts)) {
@@ -51,10 +52,16 @@ class ModelModuleRossko extends Model {
                             $stocks = array($stocks);
                         }
 
-                        array_map(function($stock) use (&$prices, &$deliveries, &$quantities) {
-                            $prices[] = $stock->Price;
+                        array_map(function($stock) use (&$prices, &$deliveries, &$quantities, $conf_overprice, $conf_delivery) {
+                            if (strpos($conf_overprice, '%')) {
+                                $price = $stock->Price + ($stock->Price / 100 * intval($conf_overprice));
+                            } else {
+                                $price = $stock->Price + $conf_overprice;
+                            }
+
+                            $prices[] = $price;
                             $quantities[] = $stock->Count;
-                            $deliveries[] = $stock->DeliveryTime;
+                            $deliveries[] = $stock->DeliveryTime + $conf_delivery;
                         }, $stocks);
 
                         foreach($stocks as $stock) {
