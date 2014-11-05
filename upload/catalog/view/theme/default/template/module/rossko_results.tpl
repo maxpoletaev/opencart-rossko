@@ -35,7 +35,7 @@
               <td>
                 <form class="rossko_product_buy" method="post">
                   <input type="hidden" name="product_uid" value="<?php echo $product['uid']; ?>" />
-                  <input class="rossko_product_buy_quantuty" type="number" name="number" value="1" max="<?php echo $product['quantity']; ?>" />
+                  <input class="rossko_product_buy_quantuty" type="number" name="quantity" value="1" max="<?php echo $product['quantity']; ?>" />
                   <button class="rossko_product_buy_button">Купить</button>
                 </form>
               </td>
@@ -52,10 +52,11 @@
 <script>$(function() {
 
   $('.rossko_product_buy').on('submit', function(e) {
-    $.post('/index.php?route=module/rossko/addtocart', {
-      data: $(this).serialize(),
-      complete: function(res) {
-        alert('Товар ' + res.name + ' добавлен в корзину.');
+    var data = $(this).serializeArray();
+    $.post('/index.php?route=module/rossko/addtocart', data).done(function(res) {
+      if (res) {
+        alert('Товар «' + res.product.name + '» добавлен в корзину.');
+        $('#cart-total').html(res.total);
       }
     });
     e.preventDefault();

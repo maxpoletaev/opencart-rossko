@@ -99,8 +99,53 @@ class ModelModuleRossko extends Model {
         return $index[$uid];
     }
 
-    public function saveProduct($product) {
-        $admin = $this->loadAdminModel('catalog/product');
+    public function saveProduct($product_data) {
+        $admin = $this->injectAdminModel('catalog/product');
+
+        $product = array(
+            'quantity' => $product_data['quantity'],
+            'price'    => $product_data['price'],
+            'model'    => $product_data['code'],
+            'sku'      => $product_data['uid'],
+            'ean'      => '',
+            'jan'      => '',
+            'isbn'     => '',
+            'mpn'      => '',
+            'upc'      => '',
+            'location' => '',
+            'minimum'  => '',
+            'subtract' => '',
+            'shipping' => '',
+            'points'   => '',
+            'weight'   => '',
+            'width'    => '',
+            'height'   => '',
+            'keyword'  => '',
+            'length'   => '',
+            'status'   => 1,
+
+            'sort_order'       => 100,
+            'date_available'   => date('Y-m-d'),
+            'product_category' => array(59),
+            'product_store'    => array(0),
+            'manufacturer_id'  => 0,
+            'weight_class_id'  => 0,
+            'stock_status_id'  => 7,
+            'length_class_id'  => 0,
+            'tax_class_id'     => 0,
+        );
+
+        $product['product_description'][1] = array(
+            'tag'              => '',
+            'name'             => $product_data['name'],
+            'seo_h1'           => '',
+            'seo_title'        => '',
+            'description'      => '',
+            'meta_keyword'     => '',
+            'meta_description' => '',
+        );
+
+        return $admin->addProduct($product);
     }
 
     private function pushToIndex($products) {
@@ -119,7 +164,7 @@ class ModelModuleRossko extends Model {
     }
 
     private function injectAdminModel($model) {
-        $file = DIR_APPLICATION . '/admin/model/' . $model . '.php';
+        $file = DIR_APPLICATION . '../admin/model/' . $model . '.php';
         $class = 'Model' . preg_replace('/[^a-zA-Z0-9]/', '', $model);
 
         if (file_exists($file)) {
