@@ -101,6 +101,7 @@ class ModelModuleRossko extends Model {
 
     public function saveProduct($product_data) {
         $admin = $this->injectAdminModel('catalog/product');
+        $category = array($this->config->get('rossko_category'));
 
         $product = array(
             'quantity' => $product_data['quantity'],
@@ -126,7 +127,7 @@ class ModelModuleRossko extends Model {
 
             'sort_order'       => 100,
             'date_available'   => date('Y-m-d'),
-            'product_category' => array(59),
+            'product_category' => $category,
             'product_store'    => array(0),
             'manufacturer_id'  => 0,
             'weight_class_id'  => 0,

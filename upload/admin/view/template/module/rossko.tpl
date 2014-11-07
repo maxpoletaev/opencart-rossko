@@ -39,6 +39,16 @@
               <td>Погрешность доставки:</td>
               <td><input type="text" name="delivery" value="<?php echo $conf['delivery']; ?>" /> дней</td>
             </tr>
+            <tr>
+              <td>Категория для хранения товаров:</td>
+              <td>
+                <select name="category">
+                  <?php foreach ($categories as $category) { ?>
+                    <option value="<?php echo $category['category_id']; ?>" <?php echo ($conf['category'] == $category['category_id']) ? 'selected' : ''; ?>><?php echo $category['name']; ?></option>
+                  <?php } ?>
+                </select>
+              </td>
+            </tr>
           </table>
         </div>
       </form>
