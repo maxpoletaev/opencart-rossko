@@ -25,6 +25,7 @@ class ControllerModuleRossko extends Controller {
             'common/footer'
         );
 
+        $this->document->setTitle($this->data['heading_title']);
         $this->response->setOutput($this->render());
     }
 

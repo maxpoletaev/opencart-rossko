@@ -7,10 +7,12 @@ class ControllerModuleRossko extends Controller {
 
         $this->data['query'] = '';
         $this->data['products'] = array();
+        $document_title = 'Поиск автозапчастей';
 
         if (isset($this->request->get['query'])) {
             $this->data['query'] = $query = $this->request->get['query'];
             $this->data['products'] = $this->model_module_rossko->searchProduct($query);
+            $document_title = "{$query} — {$document_title}";
         }
 
         if (file_exists(DIR_TEMPLATE . 'catalog/view/theme/' . $this->config->get('config_template') . '/stylesheet/rossko.css')) {
@@ -34,6 +36,7 @@ class ControllerModuleRossko extends Controller {
             'common/header'
         );
 
+        $this->document->setTitle($document_title);
         $this->response->setOutput($this->render());
     }
 
