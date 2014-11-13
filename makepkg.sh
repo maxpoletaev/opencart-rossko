@@ -12,13 +12,14 @@ INSTALL_DIR="$DIR/../opencart"
 UPLOAD_DIR="$DIR/upload"
 
 FILES=(
-    "catalog/controller/module/rossko.php"
     "catalog/model/module/rossko.php"
+    "catalog/controller/module/rossko.php"
     "catalog/view/theme/default/template/module/rossko.tpl"
     "catalog/view/theme/default/template/module/rossko_results.tpl"
     "catalog/view/theme/default/stylesheet/rossko.css"
-    "admin/controller/module/rossko.php"
+    "admin/language/russian/module/rossko.php"
     "admin/view/template/module/rossko.tpl"
+    "admin/controller/module/rossko.php"
 )
 
 for FILE in "${FILES[@]}"; do
