@@ -53,25 +53,18 @@ class ModelModuleRossko extends Model {
                         }
 
                         array_map(function($stock) use (&$prices, &$deliveries, &$quantities, $conf_overprice, $conf_delivery) {
-                            if (strpos($conf_overprice, '%')) {
-                                $price = $stock->Price + ($stock->Price / 100 * intval($conf_overprice));
-                            } else {
-                                $price = $stock->Price + $conf_overprice;
+                            if ($stock->Price > 0) {
+                                if (strpos($conf_overprice, '%')) {
+                                    $price = $stock->Price + ($stock->Price / 100 * intval($conf_overprice));
+                                } else {
+                                    $price = $stock->Price + $conf_overprice;
+                                }
+
+                                $prices[] = $price;
+                                $quantities[] = $stock->Count;
+                                $deliveries[] = $stock->DeliveryTime + $conf_delivery;
                             }
-
-                            $prices[] = $price;
-                            $quantities[] = $stock->Count;
-                            $deliveries[] = $stock->DeliveryTime + $conf_delivery;
                         }, $stocks);
-
-                        foreach($stocks as $stock) {
-                            $product['stocks'][] = array(
-                                'id'       => isset($stock->StockID) ? $stock->StockID : '',
-                                'price'    => $stock->Price,
-                                'delivery' => $stock->DeliveryTime,
-                                'quantity' => $stock->Count
-                            );
-                        }
 
                         $product['price'] = (count($prices) > 1) ? min($prices) : $prices[0];
                         $product['quantity'] = (count($quantities) > 1) ? max($quantities) : $quantities[0];
