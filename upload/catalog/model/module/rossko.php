@@ -20,59 +20,7 @@ class ModelModuleRossko extends Model {
             $searchResult = $query->SearchResults->SearchResult;
 
             if ($searchResult->Success && isset($searchResult->PartsList)) {
-                $conf_overprice = $this->config->get('rossko_overprice');
-                $conf_delivery = $this->config->get('rossko_delivery');
-
-                $parts = $searchResult->PartsList->Part;
-
-                if (!is_array($parts)) {
-                    $parts = array($parts);
-                }
-
-                foreach ($parts as $part) {
-                    $product = array(
-                        'uid'      => $part->GUID,
-                        'name'     => $part->Name,
-                        'brand'    => $part->Brand,
-                        'code'     => $part->PartNumber,
-                        'quantity' => null,
-                        'price'    => null,
-                        'delivery' => null,
-                        'stocks'   => array(),
-                    );
-
-                    if (isset($part->StocksList->Stock)) {
-                        $prices = array();
-                        $deliveries = array();
-                        $quantities = array();
-
-                        $stocks = $part->StocksList->Stock;
-
-                        if (!is_array($stocks)) {
-                            $stocks = array($stocks);
-                        }
-
-                        array_map(function($stock) use (&$prices, &$deliveries, &$quantities, $conf_overprice, $conf_delivery) {
-                            if ($stock->Price > 0) {
-                                if (strpos($conf_overprice, '%')) {
-                                    $price = $stock->Price + ($stock->Price / 100 * intval($conf_overprice));
-                                } else {
-                                    $price = $stock->Price + $conf_overprice;
-                                }
-
-                                $prices[] = $price;
-                                $quantities[] = $stock->Count;
-                                $deliveries[] = $stock->DeliveryTime + $conf_delivery;
-                            }
-                        }, $stocks);
-
-                        $product['price'] = (count($prices) > 1) ? min($prices) : $prices[0];
-                        $product['quantity'] = (count($quantities) > 1) ? max($quantities) : $quantities[0];
-                        $product['delivery'] = (count($deliveries) > 1) ? min($deliveries) : $deliveries[0];
-                    }
-
-                    $products[] = $product;
-                }
+                $products = $this->parseParts($searchResult->PartsList->Part);
             }
 
             $this->pushToIndex($products);
@@ -165,6 +113,84 @@ class ModelModuleRossko extends Model {
             include_once($file);
             return new $class($this->registry);
         }
+    }
+
+    private function getBestStock($stock_list) {
+        $cleaned_stocks = array();
+
+        foreach ($stock_list as $stock) {
+            if ($stock->Price && $stock->Count) {
+                $cleaned_stocks[] = $stock;
+            }
+        }
+
+        uasort($cleaned_stocks, function($a, $b) {
+            return $a->Price - $b->Price;
+        });
+
+        return !empty($cleaned_stocks) ? $cleaned_stocks[0] : null;
+    }
+
+    private function parseParts($parts, $result=array()) {
+        $conf_overprice = $this->config->get('rossko_overprice');
+        $conf_delivery = $this->config->get('rossko_delivery');
+
+        if (!is_array($parts)) {
+            $parts = array($parts);
+        }
+
+        foreach ($parts as $part) {
+            if ($part->Name) {
+                $product = array(
+                    'uid'      => $part->GUID,
+                    'name'     => $part->Name,
+                    'brand'    => $part->Brand,
+                    'code'     => $part->PartNumber,
+                    'quantity' => null,
+                    'price'    => null,
+                    'delivery' => null,
+                    'stocks'   => array(),
+                );
+
+                if (isset($part->StocksList->Stock)) {
+                    $prices = array();
+                    $deliveries = array();
+                    $quantities = array();
+
+                    $stocks = $part->StocksList->Stock;
+
+                    if (!is_array($stocks)) {
+                        $stocks = array($stocks);
+                    }
+
+                    $stock = $this->getBestStock($stocks);
+
+                    if ($stock) {
+                        if (strpos($conf_overprice, '%')) {
+                            $product['price'] = $stock->Price + ($stock->Price / 100 * intval($conf_overprice));
+                        } else {
+                            $product['price'] = $stock->Price;
+                        }
+
+                        if ($conf_delivery) {
+                            $product['delivery'] = $stock->DeliveryTime + $conf_delivery;
+                        } else {
+                            $product['delivery'] = $stock->DeliveryTime;
+                        }
+
+                        $product['quantity'] = $stock->Count;
+                    }
+                }
+
+                if ($product['price']) $result[] = $product;
+            }
+
+            if (isset($part->CrossesList)) {
+                $result = $this->parseParts($part->CrossesList->Part, $result);
+            }
+        }
+
+        return $result;
     }
 
 }
