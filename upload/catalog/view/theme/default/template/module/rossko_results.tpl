@@ -53,9 +53,13 @@
 
   $('.rossko_product_buy').on('submit', function(e) {
     var data = $(this).serializeArray();
+    var $button = $(this).find('button');
+    $button.text('Подождите').attr('disabled', true);
+
     $.post('/index.php?route=module/rossko/addtocart', data).done(function(res) {
       if (res) {
         alert('Товар «' + res.product.name + '» добавлен в корзину.');
+        $button.text('Купить').attr('disabled', false);
         $('#cart-total').html(res.total);
       }
     });
