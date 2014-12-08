@@ -19,7 +19,7 @@ class ControllerModuleRossko extends Controller {
             $this->cache->delete('rossko');
         }
 
-        $categories = $this->model_catalog_category->getCategoriesByParentId();
+        $categories = $this->model_catalog_category->getCategories(array());
         $this->data['categories'] = array();
 
         foreach ($categories as $category) {
