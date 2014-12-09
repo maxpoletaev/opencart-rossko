@@ -133,7 +133,11 @@ class ModelModuleRossko extends Model {
 
     private function parseParts($parts, $result=array()) {
         $conf_overprice = $this->config->get('rossko_overprice');
-        $conf_delivery = $this->config->get('rossko_delivery');
+
+        $conf_delivery = array(
+            $this->config->get('rossko_delivery_from'),
+            $this->config->get('rossko_delivery_to')
+        );
 
         if (!is_array($parts)) {
             $parts = array($parts);
@@ -172,17 +176,16 @@ class ModelModuleRossko extends Model {
                             $product['price'] = $stock->Price;
                         }
 
-                        if ($conf_delivery) {
-                            $product['delivery'] = $stock->DeliveryTime + $conf_delivery;
-                        } else {
-                            $product['delivery'] = $stock->DeliveryTime;
-                        }
-
+                        $product['delivery_from'] = $stock->DeliveryTime + $conf_delivery[0];
+                        $product['delivery_to'] = $stock->DeliveryTime + $conf_delivery[1];
                         $product['quantity'] = $stock->Count;
                     }
                 }
 
-                if ($product['price']) $result[] = $product;
+                if ($product['price']) {
+                    $product['price'] = ceil($product['price']);
+                    $result[] = $product;
+                }
             }
 
             if (isset($part->CrossesList)) {

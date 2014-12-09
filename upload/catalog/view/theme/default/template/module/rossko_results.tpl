@@ -30,7 +30,7 @@
               <td><?php echo $product['name']; ?></td>
               <td><?php echo $product['brand']; ?></td>
               <td><?php echo $product['quantity']; ?></td>
-              <td>от <?php echo $product['delivery']; ?> дней</td>
+              <td><?php echo $product['delivery_from']; ?> - <?php echo $product['delivery_to']; ?> дней</td>
               <td><?php echo $product['price']; ?> руб.</td>
               <td>
                 <form class="rossko_product_buy" method="post">

@@ -37,7 +37,7 @@
             </tr>
             <tr>
               <td>Погрешность доставки:</td>
-              <td><input type="text" name="delivery" value="<?php echo $conf['delivery']; ?>" /> дней</td>
+              <td><input type="text" name="delivery_from" value="<?php echo $conf['delivery_from']; ?>" style="width: 50px;" /> - <input type="text" name="delivery_to" value="<?php echo $conf['delivery_to']; ?>" style="width: 50px;" /> дней</td>
             </tr>
             <tr>
               <td>Категория для хранения товаров:</td>

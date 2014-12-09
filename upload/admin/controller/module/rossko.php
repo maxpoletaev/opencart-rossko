@@ -10,7 +10,7 @@ class ControllerModuleRossko extends Controller {
         $this->data['action'] = $this->url->link('module/rossko', 'token=' . $this->session->data['token'], 'SSL');
 
         $this->data['conf'] = $this->getConfig(array(
-            'key1', 'key2', 'region', 'overprice', 'delivery', 'category'
+            'key1', 'key2', 'region', 'overprice', 'delivery_from', 'delivery_to', 'category'
         ));
 
         if (($this->request->server['REQUEST_METHOD'] == 'POST')) {
